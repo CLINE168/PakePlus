@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>动车段物料全生命周期跟踪管理系统</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===== 登录界面 ===== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-bg"></div>
+  <div class="login-container">
+    <!-- 登录框 -->
+    <div class="login-box" id="loginBox">
+      <div class="login-logo">🚄</div>
+      <h1 class="login-title">动车段物料管理系统</h1>
+      <p class="login-subtitle">全生命周期跟踪管理平台</p>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="login-field">
+          <label>用户名</label>
+          <input type="text" id="loginUser" placeholder="请输入用户名" autocomplete="username">
+        </div>
+        <div class="login-field">
+          <label>密码</label>
+          <input type="password" id="loginPass" placeholder="请输入密码" autocomplete="current-password">
+        </div>
+        <div class="login-options">
+          <label class="login-remember">
+            <input type="checkbox" id="loginRemember" checked> 记住密码
+          </label>
+        </div>
+        <button type="submit" class="login-btn">登 录</button>
+        <div class="login-error" id="loginError"></div>
+      </form>
+      <div class="login-links">
+        <span class="login-link" onclick="showRegister()">📝 注册账号</span>
+        <span class="login-link" onclick="showForgotPassword()">🔑 忘记密码</span>
+      </div>
+    </div>
+    <!-- 注册框 -->
+    <div class="login-box" id="registerBox" style="display:none">
+      <div class="login-logo">📝</div>
+      <h1 class="login-title">注册新账号</h1>
+      <p class="login-subtitle">创建您的物料管理系统账号</p>
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="login-field">
+          <label>用户名</label>
+          <input type="text" id="regUser" placeholder="请输入用户名（字母数字组合）" required>
+        </div>
+        <div class="login-field">
+          <label>显示名称</label>
+          <input type="text" id="regName" placeholder="请输入您的姓名或昵称" required>
+        </div>
+        <div class="login-field">
+          <label>密码</label>
+          <input type="password" id="regPass" placeholder="请输入密码（至少6位）" required minlength="6">
+        </div>
+        <div class="login-field">
+          <label>确认密码</label>
+          <input type="password" id="regPassConfirm" placeholder="请再次输入密码" required>
+        </div>
+        <button type="submit" class="login-btn" style="background:linear-gradient(135deg,#22c55e,#16a34a);box-shadow:0 6px 20px rgba(34,197,94,.35)">注 册</button>
+        <div class="login-error" id="registerError"></div>
+      </form>
+      <div class="login-links">
+        <span class="login-link" onclick="showLogin()">🔙 返回登录</span>
+      </div>
+    </div>
+    <!-- 忘记密码框 -->
+    <div class="login-box" id="forgotBox" style="display:none">
+      <div class="login-logo">🔑</div>
+      <h1 class="login-title">忘记密码</h1>
+      <p class="login-subtitle">重置您的账号密码</p>
+      <form id="forgotForm" onsubmit="handleForgotPassword(event)">
+        <div class="login-field">
+          <label>用户名</label>
+          <input type="text" id="forgotUser" placeholder="请输入您的用户名" required>
+        </div>
+        <div class="login-field">
+          <label>新密码</label>
+          <input type="password" id="forgotPass" placeholder="请输入新密码（至少6位）" required minlength="6">
+        </div>
+        <div class="login-field">
+          <label>确认新密码</label>
+          <input type="password" id="forgotPassConfirm" placeholder="请再次输入新密码" required>
+        </div>
+        <button type="submit" class="login-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 6px 20px rgba(245,158,11,.35)">重置密码</button>
+        <div class="login-error" id="forgotError"></div>
+      </form>
+      <div class="login-links">
+        <span class="login-link" onclick="showLogin()">🔙 返回登录</span>
+      </div>
+    </div>
+    <p class="login-footer">高铁智能制造与数字化设计产教融合 · 动车段物料全生命周期跟踪管理系统</p>
+  </div>
+</div>
+
+<!-- ===== 主系统 ===== -->
+<div class="app-layout" id="appLayout" style="display:none">
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
+<div class="logo">
+<div class="logo-icon">🚄</div>
+<h2>动车段物料全生命周期跟踪管理系统</h2>
+<p>LIFE CYCLE MANAGEMENT SYSTEM</p>
+</div>
+<div class="nav-item active" onclick="switchNav(this,'home')"><span class="nav-icon">🏠</span>高铁智能制造与数字化设计产教融合</div>
+<div class="nav-item" onclick="switchNav(this,'category')"><span class="nav-icon">📂</span>分类管理<span class="nav-badge" id="navCatCount">0</span></div>
+<div class="nav-item" onclick="switchNav(this,'inventory')"><span class="nav-icon">📊</span>库存管理<span class="nav-badge" id="navInvCount">0</span></div>
+<div class="nav-item" onclick="switchNav(this,'inbound')"><span class="nav-icon">📥</span>物料入库</div>
+<div class="nav-item" onclick="switchNav(this,'outbound')"><span class="nav-icon">📤</span>物料出库</div>
+<div class="nav-item" onclick="switchNav(this,'tracking')"><span class="nav-icon">🔍</span>物料追踪</div>
+<div class="nav-item" onclick="switchNav(this,'scrap')"><span class="nav-icon">🗑️</span>物料报废<span class="nav-badge" id="navScrapCount">0</span></div>
+<div class="nav-item" onclick="switchNav(this,'io')"><span class="nav-icon">💾</span>数据导入导出</div>
+<div class="nav-footer">
+  <div class="user-info">
+    <div class="user-avatar">👤</div>
+    <div>
+      <div class="user-name" id="sidebarUserName">系统管理员</div>
+      <div class="user-role">动车段 · 物料管理</div>
+    </div>
+    <button class="logout-btn" onclick="handleLogout()" title="退出登录">🚪</button>
+  </div>
+</div>
+</div>
+
+<div class="main-content">
+<div class="topbar">
+<div style="display:flex;align-items:center;gap:8px">
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+<div class="page-title">
+<h1 id="pageTitle">高铁智能制造与数字化设计产教融合</h1>
+<p id="pageSubtitle">动车段物料全生命周期跟踪管理系统 · 实时监控物料流转</p>
+</div>
+</div>
+<div class="topbar-actions">
+<button class="btn btn-primary" onclick="openAddModal()">➕ 新增物料</button>
+<button class="btn btn-success" onclick="exportData()">📥 导出数据</button>
+</div>
+</div>
+
+<div class="stats-row">
+<div class="stat-card"><div class="stat-header"><div class="stat-icon blue">📦</div></div><div class="stat-number" id="statTotal">0</div><div class="stat-label">物料总数</div><div class="stat-change up">↑ 全部物料</div></div>
+<div class="stat-card"><div class="stat-header"><div class="stat-icon green">✅</div></div><div class="stat-number" id="statInStock">0</div><div class="stat-label">在库数量</div><div class="stat-change up">↑ 可用库存</div></div>
+<div class="stat-card"><div class="stat-header"><div class="stat-icon orange">📁</div></div><div class="stat-number" id="statCategories">0</div><div class="stat-label">分类数量</div><div class="stat-change up">↑ 物料分类</div></div>
+<div class="stat-card"><div class="stat-header"><div class="stat-icon red">⚠️</div></div><div class="stat-number" id="statWarning">0</div><div class="stat-label">库存预警</div><div class="stat-change down">↓ 需补货</div></div>
+</div>
+
+<div class="content-section active" id="section-home">
+<div class="home-grid">
+<div class="home-card">
+<h3><span class="home-icon">📋</span>系统概览</h3>
+<div class="info-row"><span class="info-label">系统名称</span><span class="info-value">动车段物料全生命周期跟踪管理系统</span></div>
+<div class="info-row"><span class="info-label">当前版本</span><span class="info-value">v3.0</span></div>
+<div class="info-row"><span class="info-label">物料总数</span><span class="info-value" id="homeTotal">0</span></div>
+<div class="info-row"><span class="info-label">在库物料</span><span class="info-value" id="homeInStock">0</span></div>
+<div class="info-row"><span class="info-label">出库物料</span><span class="info-value" id="homeOut">0</span></div>
+<div class="info-row"><span class="info-label">维修中</span><span class="info-value" id="homeRepair">0</span></div>
+<div class="info-row"><span class="info-label">已报废</span><span class="info-value" id="homeScrap">0</span></div>
+<div class="info-row"><span class="info-label">库存总价值</span><span class="info-value" id="homeValue">¥0</span></div>
+</div>
+<div class="home-card">
+<h3><span class="home-icon">🕐</span>最近动态</h3>
+<div id="homeActivities"><div class="activity-item"><div class="activity-dot green"></div><span class="activity-text">系统初始化完成</span><span class="activity-time">刚刚</span></div></div>
+</div>
+</div>
+<div class="home-card">
+<h3><span class="home-icon">🚄</span>高铁智能制造与数字化设计产教融合</h3>
+<p style="font-size:13px;color:#64748b;line-height:1.8">本系统服务于高铁智能制造与数字化设计产教融合项目，实现动车段物料从入库、存储、出库、追踪到报废的全生命周期数字化管理。通过信息化手段提升物料管理效率，降低运营成本，为产教融合提供真实的生产环境数据支持。</p>
+</div>
+</div>
+
+<div class="content-section" id="section-category">
+<div class="filter-bar">
+<input type="text" id="catSearch" placeholder="🔍 搜索分类名称..." oninput="renderCategory()">
+<button class="btn btn-primary" onclick="openAddModal()" style="padding:8px 18px;border:none;border-radius:8px;font-size:13px;cursor:pointer;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:white;font-weight:600">➕ 新增物料</button>
+</div>
+<div id="categoryContent"></div>
+</div>
+
+<div class="content-section" id="section-inventory">
+<div class="filter-bar">
+<input type="text" id="invSearch" placeholder="🔍 搜索物料名称、编号..." oninput="renderInventory()">
+<select id="invStatusFilter" onchange="renderInventory()"><option value="">全部状态</option><option value="在库">在库</option><option value="出库">出库</option><option value="维修">维修</option><option value="报废">报废</option></select>
+<select id="invCatFilter" onchange="renderInventory()"><option value="">全部分类</option><option value="电子产品">电子产品</option><option value="机械设备">机械设备</option><option value="建筑材料">建筑材料</option><option value="包装材料">包装材料</option><option value="化工原料">化工原料</option><option value="其他">其他</option></select>
+</div>
+<div id="inventoryContent"></div>
+</div>
+
+<div class="content-section" id="section-inbound">
+<div class="transaction-form">
+<h3 style="font-size:18px;color:#0f172a;margin-bottom:16px;display:flex;align-items:center;gap:8px">📥 物料入库登记</h3>
+<form id="inboundForm" onsubmit="handleInbound(event)">
+<div class="form-group"><label>选择物料 *</label><select id="inboundMaterial" required><option value="">请选择物料</option></select></div>
+<div class="form-group"><label>入库数量 *</label><input type="number" id="inboundQty" required min="1" placeholder="请输入入库数量"></div>
+<div class="form-group"><label>入库类型</label><select id="inboundType"><option value="采购入库">采购入库</option><option value="退货入库">退货入库</option><option value="调拨入库">调拨入库</option><option value="其他">其他</option></select></div>
+<div class="form-group"><label>供应商</label><input type="text" id="inboundSupplier" placeholder="请输入供应商名称"></div>
+<div class="form-group"><label>备注</label><textarea id="inboundNote" placeholder="入库备注信息"></textarea></div>
+<div class="form-actions"><button type="button" class="btn btn-cancel" onclick="document.getElementById('inboundForm').reset()">重置</button><button type="submit" class="btn btn-submit">✅ 确认入库</button></div>
+</form>
+</div>
+<div style="margin-top:20px"><h4 style="font-size:14px;color:#64748b;margin-bottom:10px">📋 入库记录</h4><div id="inboundRecords"></div></div>
+</div>
+
+<div class="content-section" id="section-outbound">
+<div class="transaction-form">
+<h3 style="font-size:18px;color:#0f172a;margin-bottom:16px;display:flex;align-items:center;gap:8px">📤 物料出库登记</h3>
+<form id="outboundForm" onsubmit="handleOutbound(event)">
+<div class="form-group"><label>选择物料 *</label><select id="outboundMaterial" required><option value="">请选择物料</option></select></div>
+<div class="form-group"><label>出库数量 *</label><input type="number" id="outboundQty" required min="1" placeholder="请输入出库数量"></div>
+<div class="form-group"><label>出库类型</label><select id="outboundType"><option value="生产领用">生产领用</option><option value="销售出库">销售出库</option><option value="调拨出库">调拨出库</option><option value="其他">其他</option></select></div>
+<div class="form-group"><label>领用人</label><input type="text" id="outboundUser" placeholder="请输入领用人姓名"></div>
+<div class="form-group"><label>备注</label><textarea id="outboundNote" placeholder="出库备注信息"></textarea></div>
+<div class="form-actions"><button type="button" class="btn btn-cancel" onclick="document.getElementById('outboundForm').reset()">重置</button><button type="submit" class="btn btn-submit">✅ 确认出库</button></div>
+</form>
+</div>
+<div style="margin-top:20px"><h4 style="font-size:14px;color:#64748b;margin-bottom:10px">📋 出库记录</h4><div id="outboundRecords"></div></div>
+</div>
+
+<div class="content-section" id="section-tracking">
+<div class="filter-bar"><input type="text" id="trackSearch" placeholder="🔍 输入物料编号或名称追踪..." oninput="renderTracking()"></div>
+<div id="trackingContent"></div>
+</div>
+
+<div class="content-section" id="section-scrap">
+<div class="filter-bar"><input type="text" id="scrapSearch" placeholder="🔍 搜索报废物料..." oninput="renderScrap()"></div>
+<div id="scrapContent"></div>
+</div>
+
+<div class="content-section" id="section-io">
+<div class="io-grid">
+<div class="io-card"><div class="io-icon">📥</div><h3>导入数据</h3><p>从CSV文件导入物料数据，批量新增或更新物料信息</p><input type="file" id="importFile" accept=".csv" style="display:none" onchange="importData(event)"><button class="io-btn import" onclick="document.getElementById('importFile').click()">📤 选择文件导入</button></div>
+<div class="io-card"><div class="io-icon">📤</div><h3>导出数据</h3><p>将所有物料数据导出为CSV格式，方便备份和分析</p><button class="io-btn export" onclick="exportData()">📥 导出全部数据</button></div>
+<div class="io-card"><div class="io-icon">🗑️</div><h3>清空数据</h3><p>清空所有物料数据和操作记录，恢复系统初始状态</p><button class="io-btn danger" onclick="clearAllData()">⚠️ 清空所有数据</button></div>
+<div class="io-card"><div class="io-icon">📋</div><h3>数据统计报告</h3><p>生成物料管理统计报告，包含各类别库存分布</p><button class="io-btn export" onclick="generateReport()">📊 生成报告</button></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="formModal">
+<div class="modal">
+<h2 id="modalTitle">📝 新增物料</h2>
+<form id="materialForm" onsubmit="saveMaterial(event)">
+<input type="hidden" id="materialId">
+<div class="form-group"><label>物料名称 *</label><input type="text" id="materialName" required placeholder="请输入物料名称"></div>
+<div class="form-group"><label>物料编号 *</label><input type="text" id="materialCode" required placeholder="请输入物料编号，如 ELEC-001"></div>
+<div class="form-group"><label>分类</label><select id="materialCategory"><option value="">请选择分类</option><option value="电子产品">电子产品</option><option value="机械设备">机械设备</option><option value="建筑材料">建筑材料</option><option value="包装材料">包装材料</option><option value="化工原料">化工原料</option><option value="其他">其他</option></select></div>
+<div class="form-group"><label>单位</label><input type="text" id="materialUnit" placeholder="个、套、卷、桶等" value="个"></div>
+<div class="form-group"><label>单价 (元)</label><input type="number" id="materialPrice" min="0" step="0.01" placeholder="请输入单价"></div>
+<div class="form-group"><label>数量</label><input type="number" id="materialQuantity" min="0" placeholder="请输入数量" value="0"></div>
+<div class="form-group"><label>最低库存预警</label><input type="number" id="materialMinQuantity" min="0" placeholder="低于此数量时预警" value="0"></div>
+<div class="form-group"><label>存放位置</label><input type="text" id="materialLocation" placeholder="如 A1-01"></div>
+<div class="form-group"><label>供应商</label><input type="text" id="materialSupplier" placeholder="请输入供应商"></div>
+<div class="form-group"><label>状态</label><select id="materialStatus"><option value="在库">在库</option><option value="出库">出库</option><option value="维修">维修</option><option value="报废">报废</option></select></div>
+<div class="form-group"><label>描述</label><textarea id="materialDesc" placeholder="物料描述信息"></textarea></div>
+<div class="form-actions"><button type="button" class="btn btn-cancel" onclick="closeModal()">取消</button><button type="submit" class="btn btn-submit">💾 保存物料</button></div>
+</form>
+</div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
